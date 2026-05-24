@@ -1,0 +1,18 @@
+John Doe
+Software Engineer at Google
+
+Email: johndoe@gmail.com
+Phone: +1-555-123-4567
+LinkedIn: linkedin.com/in/johndoe
+GitHub: github.com/johndoe
+
+EDUCATION
+B.Tech in Computer Science
+MIT - 2020
+
+SKILLS
+Python, Machine Learning, TensorFlow, Docker, AWS, React
+
+EXPERIENCE
+Software Engineer
+Google - Jan 2020 to Present

@@ -1,0 +1,516 @@
+/* ═══════════════════════════════════════════════════════════
+   Resume Parser — Premium Dark Edition
+   Design Tokens & Full UI Overhaul
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Design System Tokens ────────────────────────────────── */
+:root {
+  --bg-primary:     #0a0a0f;
+  --bg-secondary:   #111118;
+  --bg-tertiary:    #1a1a24;
+  --bg-hover:       #22222e;
+  --border:         #2a2a38;
+  --border-bright:  #3d3d52;
+  --text-primary:   #f0f0f5;
+  --text-secondary: #9090a8;
+  --text-dim:       #55556a;
+  --accent-purple:  #7c6af7;
+  --accent-blue:    #4a9eff;
+  --accent-cyan:    #00d4aa;
+  --accent-pink:    #f06292;
+  --accent-amber:   #ffa726;
+  --accent-red:     #ef5350;
+  --accent-green:   #66bb6a;
+  --glow-purple:    rgba(124,106,247,0.15);
+  --glow-blue:      rgba(74,158,255,0.15);
+  --glow-cyan:      rgba(0,212,170,0.15);
+  --radius-sm:      8px;
+  --radius-md:      12px;
+  --radius-lg:      16px;
+  --radius-xl:      24px;
+  --transition:     all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Google Font ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ══ GLOBAL ══════════════════════════════════════════════════ */
+
+* {
+  font-family: 'Inter', 'Segoe UI', sans-serif !important;
+  box-sizing: border-box;
+}
+
+/* Force dark background everywhere */
+html,
+body,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewContainer"] > .main,
+.stApp {
+  background-color: #0a0a0f !important;
+  color: #f0f0f5 !important;
+}
+
+/* Root background via body override */
+body {
+  background-color: #0a0a0f !important;
+}
+
+/* Hide Streamlit chrome */
+#MainMenu { visibility: hidden !important; }
+footer    { visibility: hidden !important; }
+header    { visibility: hidden !important; }
+.stDeployButton { display: none !important; }
+
+/* Remove default top padding */
+.block-container {
+  padding-top: 2rem !important;
+  max-width: 1000px !important;
+}
+
+/* Toolbars and top elements */
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+[data-testid="stStatusWidget"] {
+  display: none !important;
+}
+
+/* ══ SCROLLBAR ════════════════════════════════════════════════ */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #111118; }
+::-webkit-scrollbar-thumb { background: #2a2a38; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #7c6af7; }
+
+/* ══ TYPOGRAPHY ═══════════════════════════════════════════════ */
+
+h1 {
+  font-size: 2.4rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  background: linear-gradient(135deg, #f0f0f5 0%, #9090a8 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+h2, h3 {
+  color: #f0f0f5 !important;
+  font-weight: 600 !important;
+}
+
+p, li {
+  color: #9090a8 !important;
+  line-height: 1.7 !important;
+}
+
+/* Streamlit markdown text */
+.stMarkdown p {
+  color: #9090a8 !important;
+}
+
+/* Subheader color fix */
+[data-testid="stHeadingWithActionElements"] h2,
+[data-testid="stHeadingWithActionElements"] h3 {
+  color: #f0f0f5 !important;
+}
+
+/* ══ DIVIDER ══════════════════════════════════════════════════ */
+
+hr {
+  border-color: #2a2a38 !important;
+  margin: 1.5rem 0 !important;
+}
+
+[data-testid="stDivider"] hr {
+  border-color: #2a2a38 !important;
+}
+
+/* ══ TABS ═════════════════════════════════════════════════════ */
+
+.stTabs [data-baseweb="tab-list"] {
+  background: #111118 !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  border: 1px solid #2a2a38 !important;
+  gap: 4px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+  background: transparent !important;
+  color: #9090a8 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.stTabs [aria-selected="true"] {
+  background: linear-gradient(135deg, #7c6af7, #4a9eff) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(124,106,247,0.4) !important;
+}
+
+.stTabs [data-baseweb="tab"]:hover:not([aria-selected="true"]) {
+  background: #1a1a24 !important;
+  color: #f0f0f5 !important;
+}
+
+/* Tab panel background */
+.stTabs [data-baseweb="tab-panel"] {
+  background: transparent !important;
+  padding: 1rem 0 0 0 !important;
+}
+
+/* Tab border indicator line - hide default */
+.stTabs [data-baseweb="tab-highlight"] {
+  display: none !important;
+}
+
+/* ══ FILE UPLOADER ════════════════════════════════════════════ */
+
+[data-testid="stFileUploader"] {
+  background: #111118 !important;
+  border: 2px dashed #2a2a38 !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-testid="stFileUploader"]:hover {
+  border-color: #7c6af7 !important;
+  background: rgba(124,106,247,0.05) !important;
+  box-shadow: 0 0 30px rgba(124,106,247,0.1) !important;
+}
+
+[data-testid="stFileUploader"] section {
+  background: transparent !important;
+}
+
+[data-testid="stFileUploaderDropzone"] {
+  background: transparent !important;
+  border: none !important;
+}
+
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] p,
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] small {
+  color: #9090a8 !important;
+}
+
+/* ══ TEXT INPUT & TEXT AREA ═══════════════════════════════════ */
+
+.stTextArea textarea,
+.stTextInput input {
+  background: #111118 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 12px !important;
+  color: #f0f0f5 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.stTextArea textarea:focus,
+.stTextInput input:focus {
+  border-color: #7c6af7 !important;
+  box-shadow: 0 0 0 3px rgba(124,106,247,0.2) !important;
+  outline: none !important;
+}
+
+.stTextArea textarea::placeholder,
+.stTextInput input::placeholder {
+  color: #55556a !important;
+}
+
+.stTextArea label,
+.stTextInput label {
+  color: #9090a8 !important;
+}
+
+/* ══ BUTTONS ══════════════════════════════════════════════════ */
+
+/* Primary buttons */
+.stButton > button {
+  background: linear-gradient(135deg, #7c6af7 0%, #4a9eff 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 28px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.01em !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 15px rgba(124,106,247,0.3) !important;
+}
+
+.stButton > button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(124,106,247,0.5) !important;
+  filter: brightness(1.1) !important;
+}
+
+.stButton > button:active {
+  transform: translateY(0px) !important;
+}
+
+/* Download buttons */
+[data-testid="stDownloadButton"] > button {
+  background: #1a1a24 !important;
+  color: #f0f0f5 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: none !important;
+}
+
+[data-testid="stDownloadButton"] > button:hover {
+  border-color: #7c6af7 !important;
+  color: #7c6af7 !important;
+  background: rgba(124,106,247,0.08) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ══ METRICS ══════════════════════════════════════════════════ */
+
+[data-testid="stMetric"],
+[data-testid="metric-container"] {
+  background: #111118 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-testid="stMetric"]:hover,
+[data-testid="metric-container"]:hover {
+  border-color: #7c6af7 !important;
+  box-shadow: 0 4px 20px rgba(124,106,247,0.15) !important;
+  transform: translateY(-2px) !important;
+}
+
+[data-testid="stMetricLabel"] {
+  color: #9090a8 !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
+
+[data-testid="stMetricValue"] {
+  color: #f0f0f5 !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+[data-testid="stMetricDelta"] {
+  color: #ef5350 !important;
+}
+
+/* ══ PROGRESS BAR ═════════════════════════════════════════════ */
+
+.stProgress > div > div {
+  background: linear-gradient(90deg, #7c6af7, #4a9eff, #00d4aa) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 10px rgba(124,106,247,0.5) !important;
+}
+
+.stProgress > div {
+  background: #1a1a24 !important;
+  border-radius: 999px !important;
+  height: 8px !important;
+}
+
+/* ══ DATAFRAME ════════════════════════════════════════════════ */
+
+[data-testid="stDataFrame"],
+[data-testid="stDataFrameResizable"] {
+  background: #111118 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+[data-testid="stDataFrame"] th,
+.stDataFrame th {
+  background: #1a1a24 !important;
+  color: #9090a8 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  border-bottom: 1px solid #2a2a38 !important;
+}
+
+[data-testid="stDataFrame"] td,
+.stDataFrame td {
+  color: #f0f0f5 !important;
+  border-bottom: 1px solid #1a1a24 !important;
+}
+
+/* DataFrame iframe */
+.stDataFrame iframe {
+  background: #111118 !important;
+}
+
+/* ══ SIDEBAR ══════════════════════════════════════════════════ */
+
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] > div {
+  background: #0d0d14 !important;
+  border-right: 1px solid #2a2a38 !important;
+}
+
+[data-testid="stSidebar"] .stMarkdown p {
+  color: #9090a8 !important;
+  font-size: 0.85rem !important;
+}
+
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+  color: #f0f0f5 !important;
+  font-size: 0.9rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button {
+  background: #1a1a24 !important;
+  color: #ef5350 !important;
+  border: 1px solid rgba(239,83,80,0.3) !important;
+  box-shadow: none !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] > button:hover {
+  background: rgba(239,83,80,0.1) !important;
+  border-color: #ef5350 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+[data-testid="stSidebar"] .stInfo {
+  background: rgba(74,158,255,0.08) !important;
+  border: 1px solid rgba(74,158,255,0.25) !important;
+  color: #4a9eff !important;
+  border-radius: 8px !important;
+}
+
+/* ══ EXPANDER ═════════════════════════════════════════════════ */
+
+.streamlit-expanderHeader,
+[data-testid="stExpander"] summary {
+  background: #111118 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 10px !important;
+  color: #9090a8 !important;
+  font-weight: 500 !important;
+}
+
+.streamlit-expanderContent,
+[data-testid="stExpander"] .streamlit-expanderContent {
+  background: #111118 !important;
+  border: 1px solid #2a2a38 !important;
+  border-top: none !important;
+  border-radius: 0 0 10px 10px !important;
+}
+
+[data-testid="stExpander"] {
+  background: #111118 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 10px !important;
+}
+
+/* ══ ALERTS / NOTIFICATIONS ═══════════════════════════════════ */
+
+[data-baseweb="notification"] {
+  border-radius: 10px !important;
+  border: none !important;
+}
+
+.stSuccess,
+[data-testid="stAlert"][data-baseweb="notification"] {
+  border-radius: 10px !important;
+}
+
+/* Success */
+div[data-testid="stAlert"] > div[role="alert"][style*="background"] {
+  border-radius: 10px !important;
+}
+
+/* Target the actual alert box elements */
+[data-testid="stAlertContentInfo"],
+.stInfo > div {
+  background: rgba(74,158,255,0.08) !important;
+  border: 1px solid rgba(74,158,255,0.25) !important;
+  color: #4a9eff !important;
+  border-radius: 10px !important;
+}
+
+[data-testid="stAlertContentSuccess"],
+.stSuccess > div {
+  background: rgba(102,187,106,0.08) !important;
+  border: 1px solid rgba(102,187,106,0.3) !important;
+  color: #66bb6a !important;
+  border-radius: 10px !important;
+}
+
+[data-testid="stAlertContentWarning"],
+.stWarning > div {
+  background: rgba(255,167,38,0.08) !important;
+  border: 1px solid rgba(255,167,38,0.3) !important;
+  color: #ffa726 !important;
+  border-radius: 10px !important;
+}
+
+[data-testid="stAlertContentError"],
+.stError > div {
+  background: rgba(239,83,80,0.08) !important;
+  border: 1px solid rgba(239,83,80,0.3) !important;
+  color: #ef5350 !important;
+  border-radius: 10px !important;
+}
+
+/* Streamlit v1.30+ alert containers */
+[data-testid="stAlert"] {
+  background: transparent !important;
+  border-radius: 10px !important;
+}
+
+/* ══ CODE BLOCK ═══════════════════════════════════════════════ */
+
+.stCodeBlock,
+[data-testid="stCodeBlock"] {
+  background: #0d0d14 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 10px !important;
+}
+
+pre, code {
+  background: #0d0d14 !important;
+  color: #f0f0f5 !important;
+}
+
+/* ══ CHECKBOX ═════════════════════════════════════════════════ */
+
+.stCheckbox label {
+  color: #9090a8 !important;
+}
+
+/* ══ SELECT SLIDER / RADIO ════════════════════════════════════ */
+
+.stRadio label {
+  color: #9090a8 !important;
+}
+
+/* ══ SPINNER ══════════════════════════════════════════════════ */
+
+[data-testid="stSpinner"] > div {
+  border-top-color: #7c6af7 !important;
+}
+
+/* ══ COLUMN / ROW GAPS ════════════════════════════════════════ */
+
+[data-testid="column"] {
+  background: transparent !important;
+}

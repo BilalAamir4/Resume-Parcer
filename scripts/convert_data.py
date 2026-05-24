@@ -1,9 +1,11 @@
 import json
 import random
 import spacy
+import sys
 from spacy.tokens import DocBin
 
 def main():
+    sys.stdout.reconfigure(encoding='utf-8')
     # 1. Read data
     input_file = "data/raw/Entity_Recognition_in_Resumes.json"
     records = []
@@ -78,13 +80,23 @@ def main():
                 # 2. Add +1 to end value (inclusive -> exclusive)
                 end += 1
                 
+                # Strip leading/trailing whitespace to avoid E024 error in training
+                while start < end and text[start].isspace():
+                    start += 1
+                while end > start and text[end - 1].isspace():
+                    end -= 1
+                
                 try:
                     # 4. Wrap span creation in try/except
                     # Using alignment_mode="contract" to handle whitespace mismatch in manual annotations
                     span = doc.char_span(start, end, label=label, alignment_mode="contract")
                     if span is not None:
-                        spans.append(span)
-                        entity_counts[label] += 1
+                        # Drop if the final span text has leading or trailing whitespace
+                        if span.text != span.text.strip():
+                            print(f"Warning: Dropping span with whitespace: {repr(span.text)}")
+                        else:
+                            spans.append(span)
+                            entity_counts[label] += 1
                     else:
                         print(f"Warning: Skipped invalid span in {split_name} record {idx}. Annotation text: '{ann_text}'")
                 except Exception as e:
