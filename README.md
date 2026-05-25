@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org) [![spaCy](https://img.shields.io/badge/spaCy-v3-09A3D5)](https://spacy.io) [![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B)](https://streamlit.io) [![License](https://img.shields.io/badge/License-MIT-green)](#)
 
 ```bash
-git clone https://github.com/your-username/resume-parser.git && cd resume-parser && pip install -r requirements.txt
+git clone https://github.com/BilalAamir4/resume-parser.git && cd resume-parser && pip install -r requirements.txt
 ```
 
 | 📊 220 Training Resumes | 🏷️ 9 Entity Types | 🎯 91.95% Best F1 (Name) |
