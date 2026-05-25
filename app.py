@@ -35,8 +35,7 @@ if os.path.exists(_CSS_PATH):
 
 # ── Model loading (cached so it's only loaded once) ───────────────────────────
 _MODEL_PATH = os.path.join(
-    os.path.dirname(_HERE),   # project root
-    "training", "output", "model-best"
+    _HERE, "training", "output", "model-best"
 )
 
 
@@ -78,9 +77,8 @@ _COLORS: dict[str, str] = {
 # ═════════════════════════════════════════════════════════════════════════════
 
 def _load_eval_results() -> dict:
-    """Load training/eval_results.json relative to project root."""
-    _root = os.path.dirname(_HERE)
-    path = os.path.join(_root, "training", "eval_results.json")
+    """Load training/eval_results.json relative to app.py's directory."""
+    path = os.path.join(_HERE, "training", "eval_results.json")
     if os.path.exists(path):
         with open(path, encoding="utf-8") as f:
             return json.load(f)
@@ -89,7 +87,11 @@ def _load_eval_results() -> dict:
 
 def _get_flat(result: dict) -> dict:
     """Convenience wrapper around extractor.get_flat_result()."""
-    return ResumeExtractor.get_flat_result(result)
+    return extractor.get_flat_result(result)
+
+
+def _first_flat(lst):
+    return lst[0] if lst else ""
 
 
 def _render_pill_list(skills: list, bg_color: str, text_color: str = "white") -> str:
@@ -476,7 +478,8 @@ if "parsed_result" in st.session_state:
         unsafe_allow_html=True
     )
     if st.sidebar.button("🗑️ Clear Results"):
-        for key in ("parsed_result", "gap_result", "gap_resume_skills", "batch_df"):
+        for key in ("parsed_result", "gap_result", "gap_resume_skills",
+                    "batch_df", "_last_uploaded"):
             st.session_state.pop(key, None)
         st.rerun()
 
@@ -531,28 +534,29 @@ with tab1:
     uploaded_file = st.file_uploader(
         "Drop your resume here or click to browse",
         type=["pdf", "docx", "doc", "txt"],
-        help="Supported formats: PDF, DOCX, DOC, TXT",
-        label_visibility="visible",
+        help="Supported formats: PDF, DOCX, DOC, TXT · Max 200MB",
+        label_visibility="collapsed",
     )
 
     if uploaded_file is not None:
-        suffix = os.path.splitext(uploaded_file.name)[-1]
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-            tmp.write(uploaded_file.read())
-            tmp_path = tmp.name
-
-        with st.spinner("⏳ Parsing resume…"):
-            try:
-                result = extractor.parse(tmp_path)
-                st.session_state["parsed_result"] = result
-                st.success("✅ Resume parsed successfully!")
-            except Exception as exc:
-                st.error(f"❌ Parsing failed: {exc}")
-            finally:
+        if uploaded_file.name != st.session_state.get("_last_uploaded"):
+            st.session_state["_last_uploaded"] = uploaded_file.name
+            suffix = os.path.splitext(uploaded_file.name)[-1]
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(uploaded_file.read())
+                tmp_path = tmp.name
+            with st.spinner("⏳ Parsing resume…"):
                 try:
-                    os.unlink(tmp_path)
-                except OSError:
-                    pass
+                    result = extractor.parse(tmp_path)
+                    st.session_state["parsed_result"] = result
+                    st.success("✅ Resume parsed successfully!")
+                except Exception as exc:
+                    st.error(f"❌ Parsing failed: {exc}")
+                finally:
+                    try:
+                        os.unlink(tmp_path)
+                    except OSError:
+                        pass
 
 # ── Tab 2: Paste Text ─────────────────────────────────────────────────────────
 with tab2:
@@ -825,11 +829,8 @@ with tab4:
                     parsed = extractor.parse(tmp_path)
                     flat = _get_flat(parsed)
 
-                    def _first_flat(lst):
-                        return lst[0] if lst else ""
-
                     row = {
-                        "file_name":       flat.get("file_name", uf.name),
+                        "file_name":       parsed.get("file_name", uf.name),
                         "name":            _first_flat(flat.get("name", [])),
                         "email":           _first_flat(flat.get("email", [])),
                         "phone":           _first_flat(flat.get("phone", [])),

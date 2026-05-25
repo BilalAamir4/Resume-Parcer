@@ -13,7 +13,7 @@ import os
 # Allow imports from the project root regardless of working directory
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from resume_parser.parser.extractor import ResumeExtractor
+from parser.extractor import ResumeExtractor
 
 
 def main():

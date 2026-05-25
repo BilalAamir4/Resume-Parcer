@@ -514,3 +514,54 @@ pre, code {
 [data-testid="column"] {
   background: transparent !important;
 }
+
+/* ══ FILE UPLOADER BUTTON — FIX DOUBLE TEXT ═══════════════════ */
+
+/* Hide the default "Browse files" span inside the button */
+[data-testid="stFileUploaderDropzoneInput"] + div button span:first-child,
+[data-testid="baseButton-secondary"] span + span,
+button[data-testid="baseButton-secondary"] > span:not(:last-child) {
+  display: none !important;
+}
+
+/* Target the uploader button specifically */
+[data-testid="stFileUploader"] button {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Hide ALL text inside the upload button, then re-inject clean label */
+[data-testid="stFileUploader"] button span {
+  font-size: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Show only the LAST span (the actual label text) */
+[data-testid="stFileUploader"] button span:last-child {
+  font-size: 0.875rem !important;
+  visibility: visible !important;
+}
+
+/* Nuclear option — hide first span by position */
+[data-testid="stFileUploader"] section button > div > span:first-of-type {
+  display: none !important;
+}
+
+/* Clean up the button appearance */
+[data-testid="stFileUploader"] button {
+  background: #1a1a24 !important;
+  border: 1px solid #2a2a38 !important;
+  border-radius: 8px !important;
+  color: #f0f0f5 !important;
+  font-size: 0.875rem !important;
+  padding: 8px 16px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+}
+
+[data-testid="stFileUploader"] button:hover {
+  border-color: #7c6af7 !important;
+  color: #7c6af7 !important;
+  background: rgba(124,106,247,0.08) !important;
+}
