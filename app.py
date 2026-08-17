@@ -66,56 +66,65 @@ if os.path.exists(_CSS_PATH):
 #      stacking on both fixes the collision at any viewport width.
 st.markdown("""
 <style>
-/* ---- 1. Tabs: replace the default red underline / tint with theme colors ---- */
+/* ---- 1. Tabs: calmer, flatter selected-tab style ----
+   assets/style.css sets `.stTabs [aria-selected="true"]` background,
+   color, AND box-shadow all with !important. In CSS, an !important
+   declaration ALWAYS wins over a non-!important one for that property,
+   no matter the selector specificity or which stylesheet loaded later.
+   So every property style.css sets with !important MUST also be set
+   with !important here, or it silently loses and nothing changes
+   on screen — which is exactly what happened last time. */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 6px;
-    border-bottom: 1px solid #2a2a38;
+    gap: 6px !important;
 }
-.stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"] {
-    background-color: transparent;
-    border-radius: 8px 8px 0 0;
-    color: #9090a8;
-    padding: 8px 16px;
-    transition: all 0.15s ease;
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px !important;
+    transition: all 0.15s ease !important;
 }
-.stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"]:hover {
-    background-color: rgba(124, 106, 247, 0.08);
-    color: #f0f0f5;
-}
-.stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-    background: linear-gradient(135deg, rgba(124,106,247,0.18), rgba(74,158,255,0.18));
+.stTabs [data-baseweb="tab"]:hover:not([aria-selected="true"]) {
+    background: rgba(124, 106, 247, 0.10) !important;
     color: #f0f0f5 !important;
-    box-shadow: none;
 }
-.stTabs [data-baseweb="tab-list"] button[aria-selected="true"] p {
-    color: #f0f0f5 !important;
-    font-weight: 600;
+/* The actual fix: flat, single-tone highlight instead of the
+   purple-to-blue gradient + glow, which read as muddy/orange against
+   the tab icons. */
+.stTabs [aria-selected="true"] {
+    background: #7c6af7 !important;
+    color: white !important;
+    box-shadow: none !important;
 }
-/* Kill the default colored underline bar entirely and replace with a
-   slim, theme-colored one anchored to the selected tab. */
-.stTabs [data-baseweb="tab-highlight"] {
-    background-color: #7c6af7 !important;
-    height: 2px;
+.stTabs [aria-selected="true"] p {
+    color: white !important;
+    font-weight: 600 !important;
+}
+/* Let tabs scroll horizontally instead of truncating labels
+   ("Upload Fi...") when the row is too narrow to fit all four. */
+.stTabs [data-baseweb="tab-list"] {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+}
+.stTabs [data-baseweb="tab"] {
+    white-space: nowrap !important;
 }
 
 /* ---- 2. Fix Preview JSON / Download button overlap ---- */
 div[data-testid="stExpander"] {
-    position: relative;
-    margin-top: 12px;
-    z-index: 1;
+    position: relative !important;
+    margin-top: 12px !important;
+    z-index: 1 !important;
 }
 div[data-testid="stButton"],
 div[data-testid="stDownloadButton"] {
-    position: relative;
-    margin-bottom: 4px;
-    z-index: 1;
+    position: relative !important;
+    margin-bottom: 4px !important;
+    z-index: 1 !important;
 }
 /* Ensure columns never overlap when Streamlit stacks them on narrow
    screens — each becomes a normal block with breathing room instead of
    any inherited absolute/negative positioning collapsing them together. */
 div[data-testid="column"] {
     position: relative !important;
-    margin-bottom: 8px;
+    margin-bottom: 8px !important;
 }
 </style>
 """, unsafe_allow_html=True)
