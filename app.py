@@ -51,6 +51,75 @@ if os.path.exists(_CSS_PATH):
     with open(_CSS_PATH, encoding="utf-8") as _f:
         st.markdown(f"<style>{_f.read()}</style>", unsafe_allow_html=True)
 
+# ── App-level CSS overrides ────────────────────────────────────────────────────
+# These run AFTER assets/style.css (or standalone if it doesn't exist) so they
+# always win. Two things fixed here:
+#   1. The active-tab highlight — Streamlit's default is a bright red/orange
+#      underline + tinted background that clashes hard with this dark/purple
+#      theme. Replaced with a flat, theme-matched pill highlight.
+#   2. The "Preview JSON" expander visually overlapping the "Download JSON"
+#      button next to it. Streamlit's expander header renders as an absolutely
+#      contained flex row, but on narrower widths (or with a tight column
+#      gap) its own summary row can render on the same baseline as content
+#      above it because both stButton/stDownloadButton and stExpander default
+#      to near-zero top margin. Forcing consistent spacing + relative
+#      stacking on both fixes the collision at any viewport width.
+st.markdown("""
+<style>
+/* ---- 1. Tabs: replace the default red underline / tint with theme colors ---- */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 6px;
+    border-bottom: 1px solid #2a2a38;
+}
+.stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"] {
+    background-color: transparent;
+    border-radius: 8px 8px 0 0;
+    color: #9090a8;
+    padding: 8px 16px;
+    transition: all 0.15s ease;
+}
+.stTabs [data-baseweb="tab-list"] button[data-baseweb="tab"]:hover {
+    background-color: rgba(124, 106, 247, 0.08);
+    color: #f0f0f5;
+}
+.stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+    background: linear-gradient(135deg, rgba(124,106,247,0.18), rgba(74,158,255,0.18));
+    color: #f0f0f5 !important;
+    box-shadow: none;
+}
+.stTabs [data-baseweb="tab-list"] button[aria-selected="true"] p {
+    color: #f0f0f5 !important;
+    font-weight: 600;
+}
+/* Kill the default colored underline bar entirely and replace with a
+   slim, theme-colored one anchored to the selected tab. */
+.stTabs [data-baseweb="tab-highlight"] {
+    background-color: #7c6af7 !important;
+    height: 2px;
+}
+
+/* ---- 2. Fix Preview JSON / Download button overlap ---- */
+div[data-testid="stExpander"] {
+    position: relative;
+    margin-top: 12px;
+    z-index: 1;
+}
+div[data-testid="stButton"],
+div[data-testid="stDownloadButton"] {
+    position: relative;
+    margin-bottom: 4px;
+    z-index: 1;
+}
+/* Ensure columns never overlap when Streamlit stacks them on narrow
+   screens — each becomes a normal block with breathing room instead of
+   any inherited absolute/negative positioning collapsing them together. */
+div[data-testid="column"] {
+    position: relative !important;
+    margin-bottom: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ═════════════════════════════════════════════════════════════════════════════
 # THEME — single source of truth for colors used across all render helpers
 # ═════════════════════════════════════════════════════════════════════════════
@@ -1083,20 +1152,22 @@ if "parsed_result" in st.session_state:
     )
 
     json_str = json.dumps(result, indent=2, ensure_ascii=False)
-    exp_col1, exp_col2 = st.columns(2)
 
-    with exp_col1:
-        st.download_button(
-            label="⬇️ Download JSON (with scores)",
-            data=json_str,
-            file_name=f"parsed_{_strip_ext(result.get('file_name', 'resume'))}.json",
-            mime="application/json",
-            use_container_width=True,
-        )
+    # Download button gets its own full-width row, and the expander sits
+    # below it on a separate row. Putting these in side-by-side columns was
+    # what caused the visual overlap — the expander's collapsed header and
+    # the button rendered on the same line at narrower widths. Stacking them
+    # removes that failure mode entirely, at any screen size.
+    st.download_button(
+        label="⬇️ Download JSON (with scores)",
+        data=json_str,
+        file_name=f"parsed_{_strip_ext(result.get('file_name', 'resume'))}.json",
+        mime="application/json",
+        use_container_width=True,
+    )
 
-    with exp_col2:
-        with st.expander("👁️ Preview JSON"):
-            st.code(json_str, language="json")
+    with st.expander("👁️ Preview JSON"):
+        st.code(json_str, language="json")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # FOOTER
